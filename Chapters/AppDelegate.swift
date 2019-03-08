@@ -14,7 +14,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBOutlet weak var window: NSWindow!
     @IBOutlet weak var outlineView: NSOutlineView!
-
+    @IBOutlet weak var pdfView: PDFView!
+    
     @IBAction func selectPDF(sender: AnyObject){
         let openPanel = NSOpenPanel()
         openPanel.allowsMultipleSelection = false
@@ -26,16 +27,44 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
+    @IBAction func selectSaveFolder(sender: AnyObject){
+        let openPanel = NSOpenPanel()
+        openPanel.allowsMultipleSelection = false
+        openPanel.canChooseDirectories = true
+        openPanel.canCreateDirectories = true
+        openPanel.canChooseFiles = false
+        openPanel.begin() { (response) in
+            self.openDirectoryCallBack(response: response, openPanel: openPanel)
+        }
+    }
+    
     var rootOutline: PDFOutline?
     var pdf: PDFDocument?
+    var rootDirectoryURL: URL?
+    var pdfName: String?
 
     func openFileCallBack(response: NSApplication.ModalResponse, openPanel: NSOpenPanel){
         if response == .OK {
             let selectedPath = openPanel.urls[0]
             pdf = PDFDocument(url: selectedPath)!
+            pdfView.document = pdf!
             rootOutline = pdf!.outlineRoot!
+            pdfName = selectedPath.deletingPathExtension().lastPathComponent
             self.window!.makeKeyAndOrderFront(nil)
             self.outlineView.reloadData()
+        }
+    }
+    
+    func openDirectoryCallBack(response: NSApplication.ModalResponse, openPanel: NSOpenPanel){
+        if response == .OK {
+            let selectedURL = openPanel.urls[0].absoluteString
+            let rootDirectoryName = selectedURL+pdfName!
+            rootDirectoryURL = URL(string: rootDirectoryName)
+            do {
+                try FileManager.default.createDirectory(at: rootDirectoryURL!, withIntermediateDirectories: true, attributes: nil)
+            } catch let error as NSError {
+                print(error.localizedDescription)
+            }
         }
     }
 
@@ -47,8 +76,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
     }
-
-
 }
 
 extension AppDelegate: NSOutlineViewDelegate {
@@ -86,9 +113,9 @@ extension AppDelegate: NSOutlineViewDataSource {
     func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
         if self.rootOutline != nil {
             if let outline = item as? PDFOutline {
-                return outline.child(at: index)
+                return outline.child(at: index) as Any
             }
-            return self.rootOutline!.child(at: index)
+            return self.rootOutline!.child(at: index) as Any
         }
         return 0
     }
@@ -115,7 +142,7 @@ extension AppDelegate: NSOutlineViewDataSource {
             if let outline = item as? PDFOutline {
                 return outline.label!
             }
-            return "idk"
+            return ""
         }
         return nil
     }
