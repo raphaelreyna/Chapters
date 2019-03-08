@@ -27,12 +27,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     var rootOutline: PDFOutline?
+    var pdf: PDFDocument?
 
     func openFileCallBack(response: NSApplication.ModalResponse, openPanel: NSOpenPanel){
         if response == .OK {
             let selectedPath = openPanel.urls[0]
-            let pdfDocument = PDFDocument(url: selectedPath)!
-            rootOutline = pdfDocument.outlineRoot!
+            pdf = PDFDocument(url: selectedPath)!
+            rootOutline = pdf!.outlineRoot!
             self.window!.makeKeyAndOrderFront(nil)
             self.outlineView.reloadData()
         }
