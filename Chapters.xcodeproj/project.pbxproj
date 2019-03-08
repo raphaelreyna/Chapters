@@ -19,6 +19,7 @@
 		11D0424C2231AF8F003DF8C0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		11D0424E2231AF8F003DF8C0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		11D0424F2231AF8F003DF8C0 /* Chapters.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Chapters.entitlements; sourceTree = "<group>"; };
+		11D042552231B33E003DF8C0 /* PDFPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = PDFPlayground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +52,7 @@
 		11D042462231AF8E003DF8C0 /* Chapters */ = {
 			isa = PBXGroup;
 			children = (
+				11D042552231B33E003DF8C0 /* PDFPlayground.playground */,
 				11D042472231AF8E003DF8C0 /* AppDelegate.swift */,
 				11D042492231AF8F003DF8C0 /* Assets.xcassets */,
 				11D0424B2231AF8F003DF8C0 /* MainMenu.xib */,
