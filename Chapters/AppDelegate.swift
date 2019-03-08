@@ -59,6 +59,17 @@ extension AppDelegate: NSOutlineViewDelegate {
     func outlineView(_: NSOutlineView, shouldCollapseItem: Any) -> Bool {
         return true
     }
+    
+    func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
+        var view: NSTableCellView?
+        if let outline = item as? PDFOutline {
+            view = outlineView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "SectionCell"), owner: self) as? NSTableCellView
+            if let textField = view?.textField {
+                textField.stringValue = outline.label!
+            }
+        }
+        return view
+    }
 }
 
 extension AppDelegate: NSOutlineViewDataSource {
