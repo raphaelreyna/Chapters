@@ -73,7 +73,7 @@
                         <items>
                             <menuItem title="Open…" keyEquivalent="o" id="IAo-SY-fd9">
                                 <connections>
-                                    <action selector="selectPDFWithSender:" target="Voe-Tx-rLC" id="n3o-Mu-Hok"/>
+                                    <action selector="selectPDFActionWithSender:" target="Voe-Tx-rLC" id="PaZ-97-YCv"/>
                                 </connections>
                             </menuItem>
                         </items>
@@ -111,7 +111,7 @@
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                         <connections>
-                            <action selector="selectSaveFolderWithSender:" target="Voe-Tx-rLC" id="eee-x6-UUd"/>
+                            <action selector="selectSaveFolderActionWithSender:" target="Voe-Tx-rLC" id="9hP-VX-kIj"/>
                         </connections>
                     </button>
                     <splitView arrangesAllSubviews="NO" dividerStyle="paneSplitter" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="F58-St-52s">

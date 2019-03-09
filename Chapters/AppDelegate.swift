@@ -9,24 +9,81 @@
 import Cocoa
 import Quartz
 
-extension String {
-    var forSorting: String {
-        let c = CharacterSet(charactersIn: "-")
-        let charset = c.symmetricDifference(CharacterSet.alphanumerics)
-        let simple = folding(options: [.diacriticInsensitive, .widthInsensitive], locale: nil)
-        let nonAlphaNumeric = charset.inverted
-        return simple.components(separatedBy: nonAlphaNumeric).joined(separator: "")
-    }
-}
-
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
+    // MARK: - IBOutlets
     @IBOutlet weak var window: NSWindow!
     @IBOutlet weak var outlineView: NSOutlineView!
     @IBOutlet weak var pdfView: PDFView!
     
-    @IBAction func selectPDF(sender: AnyObject){
+    // MARK: - IBActions
+    @IBAction func selectPDFAction(sender: AnyObject){
+        self.selectPDF(sender: sender)
+    }
+    
+    @IBAction func selectSaveFolderAction(sender: AnyObject){
+        self.selectSaveFolder(sender: sender)
+    }
+    
+    // MARK: - Properties
+    
+    var rootOutline: PDFOutline?
+    var flatRootOutline: [PDFOutline] = [] // A flat, sequential list of all of root outlines descendents.
+    var pdf: PDFDocument? // PDF that is to be split.
+    var pdfName: String? // Name of PDF that is to be split.
+    var dirtyPDF: PDFDocument? // Sub PDF waiting to be displayed.
+    var prevPDF: PDFDocument? // Sub PDF being displayed.
+    var outlineViewDataSource: OutlineDataSource? {
+        didSet {
+            self.outlineView.dataSource = outlineViewDataSource!
+        }
+    }
+    
+    // MARK: - Callbacks
+    
+    func openFileCallBack(response: NSApplication.ModalResponse, openPanel: NSOpenPanel){
+        if response == .OK {
+            let selectedPath = openPanel.urls[0]
+            
+            self.pdf = PDFDocument(url: selectedPath)!
+            self.pdfView.document = self.pdf!
+            self.rootOutline = pdf!.outlineRoot!
+            self.outlineViewDataSource = OutlineDataSource(for: self.pdf!)
+            self.pdfName = selectedPath.deletingPathExtension().lastPathComponent
+            
+            flatten(outline: self.rootOutline!, into: &(self.flatRootOutline))
+            
+            self.window!.makeKeyAndOrderFront(nil)
+            self.outlineView.reloadData()
+        }
+    }
+    
+    func openDirectoryCallBack(response: NSApplication.ModalResponse, openPanel: NSOpenPanel){
+        if response == .OK {
+            let selectedURL = openPanel.urls[0].absoluteString
+            let rootDirectoryName = selectedURL+pdfName!
+            let rootDirectoryURL = URL(string: rootDirectoryName)
+            do {
+                try FileManager.default.createDirectory(at: rootDirectoryURL!, withIntermediateDirectories: true, attributes: nil)
+            } catch let error as NSError {
+                print(error.localizedDescription)
+            }
+            for i in 0..<self.flatRootOutline.count {
+                let outline = self.flatRootOutline[i]
+                let newPDF = makePDF(from: outline, within: self.flatRootOutline, outOf: self.pdf!)
+                let path = makeURL(for: outline, relativeTo: rootDirectoryURL!)
+                newPDF.write(to: path)
+                #if DEBUG
+                print("Wrote temp pdf to: "+path.absoluteString)
+                #endif
+            }
+        }
+    }
+    
+    // MARK: - File System Methods
+    
+    func selectPDF(sender: AnyObject){
         let openPanel = NSOpenPanel()
         openPanel.allowsMultipleSelection = false
         openPanel.canChooseDirectories = false
@@ -37,7 +94,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
-    @IBAction func selectSaveFolder(sender: AnyObject){
+    func selectSaveFolder(sender: AnyObject){
         let openPanel = NSOpenPanel()
         openPanel.allowsMultipleSelection = false
         openPanel.canChooseDirectories = true
@@ -48,195 +105,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
-    var rootOutline: PDFOutline?
-    var flatRootOutline: [PDFOutline] = []
-    var pdf: PDFDocument?
-    var rootDirectoryURL: URL?
-    var pdfName: String?
-    var tempDirURL: URL?
-    var dirtyPDF: PDFDocument?
-    var prevPDF: PDFDocument?
-    
-    func flatten(outline: PDFOutline) {
-        for index in 0..<outline.numberOfChildren{
-            let child = outline.child(at: index)!
-            flatRootOutline.append(child)
-            if (child.numberOfChildren != 0){
-                flatten(outline: child)
-            }
-        }
-    }
-    
-    func traverse(outline: PDFOutline) {
-        for index in 0..<outline.numberOfChildren{
-            let child = outline.child(at: index)
-            print("Label: "+child!.label!+", Dest.: "+String(self.pdf!.index(for: child!.destination!.page!)))
-            if (child!.numberOfChildren != 0){
-                print("The child above has the following children.")
-                traverse(outline: child!)
-            }
-        }
-    }
-
-    func openFileCallBack(response: NSApplication.ModalResponse, openPanel: NSOpenPanel){
-        if response == .OK {
-            let selectedPath = openPanel.urls[0]
-            self.pdf = PDFDocument(url: selectedPath)!
-            self.pdfView.document = self.pdf!
-            self.rootOutline = pdf!.outlineRoot!
-            flatten(outline: self.rootOutline!)
-            pdfName = selectedPath.deletingPathExtension().lastPathComponent
-            self.window!.makeKeyAndOrderFront(nil)
-            self.outlineView.reloadData()
-        }
-    }
-    
-    func openDirectoryCallBack(response: NSApplication.ModalResponse, openPanel: NSOpenPanel){
-        if response == .OK {
-            let selectedURL = openPanel.urls[0].absoluteString
-            let rootDirectoryName = selectedURL+pdfName!
-            self.rootDirectoryURL = URL(string: rootDirectoryName)
-            do {
-                try FileManager.default.createDirectory(at: rootDirectoryURL!, withIntermediateDirectories: true, attributes: nil)
-            } catch let error as NSError {
-                print(error.localizedDescription)
-            }
-            for i in 0..<self.flatRootOutline.count {
-                let outline = self.flatRootOutline[i]
-                let startPage = outline.destination!.page!
-                var endPage: PDFPage?
-                if (i+1 == self.flatRootOutline.count) {
-                    let pageCount = self.pdf!.pageCount
-                    endPage = self.pdf!.page(at: pageCount-1)
-                } else {
-                    endPage = self.flatRootOutline[i+1].destination!.page!
-                }
-                let startIndex = self.pdf!.index(for: startPage)
-                let endIndex = self.pdf!.index(for: endPage!)
-                let newPDF = PDFDocument()
-                for i in startIndex...endIndex {
-                    let page = self.pdf!.page(at: i)
-                    newPDF.insert(page!, at: i-startIndex)
-                }
-                var fileName = outline.label!
-                fileName = fileName.replacingOccurrences(of: ".", with: "-")
-                fileName = fileName.forSorting
-                fileName = fileName + ".pdf"
-                let path = self.rootDirectoryURL!.absoluteString+"/"+fileName
-                newPDF.write(to: URL(string: path)!)
-                #if DEBUG
-                    print("Wrote temp pdf to: "+URL(string: path)!.absoluteString)
-                #endif
-            }
-        }
-    }
+    // MARK: - App Delegate Methods
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         self.outlineView.delegate = self
-        self.outlineView.dataSource = self
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
         // Insert code here to tear down your application
-    }
-}
-
-extension AppDelegate: NSOutlineViewDelegate {
-    func outlineView(_: NSOutlineView, shouldExpandItem: Any) -> Bool {
-        return true
-    }
-    
-    func outlineView(_: NSOutlineView, shouldCollapseItem: Any) -> Bool {
-        return true
-    }
-    
-    func outlineView(_ outlineView: NSOutlineView, shouldSelectItem item: Any) -> Bool {
-        return true
-    }
-    
-    func outlineViewSelectionIsChanging(_ notification: Notification) {
-        let selectedRow = self.outlineView!.selectedRow
-        let outline = self.outlineView!.item(atRow: selectedRow) as! PDFOutline
-        let startPage = outline.destination!.page!
-        var endPage: PDFPage?
-        let index = self.flatRootOutline.firstIndex(of: outline)!
-        if (index+1 == self.flatRootOutline.count) {
-            let pageCount = self.pdf!.pageCount
-            endPage = self.pdf!.page(at: pageCount-1)
-        } else {
-            endPage = self.flatRootOutline[index+1].destination!.page!
-        }
-        let startIndex = self.pdf!.index(for: startPage)
-        let endIndex = self.pdf!.index(for: endPage!)
-        self.dirtyPDF = PDFDocument()
-        for i in startIndex...endIndex {
-            let page = self.pdf!.page(at: i)
-            dirtyPDF!.insert(page!, at: i-startIndex)
-        }
-    }
-    
-    func outlineViewSelectionDidChange(_ notification: Notification) {
-        self.prevPDF = self.dirtyPDF
-        self.pdfView.document = self.prevPDF!
-    }
-    
-    func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
-        var view: NSTableCellView?
-        if let outline = item as? PDFOutline {
-            view = outlineView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "SectionCell"), owner: self) as? NSTableCellView
-            if let textField = view?.textField {
-                textField.stringValue = outline.label!
-            }
-        }
-        return view
-    }
-}
-
-extension AppDelegate: NSOutlineViewDataSource {
-    func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
-        if self.rootOutline != nil {
-            if let outline = item as? PDFOutline {
-                return outline.numberOfChildren
-            }
-            return self.rootOutline!.numberOfChildren
-        }
-        return 0
-    }
-    
-    func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
-        if self.rootOutline != nil {
-            if let outline = item as? PDFOutline {
-                return outline.child(at: index) as Any
-            }
-            return self.rootOutline!.child(at: index) as Any
-        }
-        return 0
-    }
-    
-    func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
-        if self.rootOutline != nil {
-            if let outline = item as? PDFOutline {
-                print(index)
-                if outline.numberOfChildren == 0 {
-                    return false
-                }
-                return true
-            }
-            if self.rootOutline!.numberOfChildren == 0 {
-                return false
-            }
-            return true
-        }
-        return false
-    }
-    
-    func outlineView(_ outlineView: NSOutlineView, objectValueFor tableColumn: NSTableColumn?, byItem item: Any?) -> Any? {
-        if self.rootOutline != nil {
-            if let outline = item as? PDFOutline {
-                return outline.label!
-            }
-            return ""
-        }
-        return nil
     }
 }
