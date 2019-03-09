@@ -9,6 +9,16 @@
 import Cocoa
 import Quartz
 
+extension String {
+    var forSorting: String {
+        let c = CharacterSet(charactersIn: "-")
+        let charset = c.symmetricDifference(CharacterSet.alphanumerics)
+        let simple = folding(options: [.diacriticInsensitive, .widthInsensitive], locale: nil)
+        let nonAlphaNumeric = charset.inverted
+        return simple.components(separatedBy: nonAlphaNumeric).joined(separator: "")
+    }
+}
+
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
@@ -77,33 +87,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.window!.makeKeyAndOrderFront(nil)
             self.outlineView.reloadData()
             
-            for i in 0..<self.flatRootOutline.count {
-                let outline = self.flatRootOutline[i]
-                let startPage = outline.destination!.page!
-                var endPage: PDFPage?
-                if (i+1 == self.flatRootOutline.count) {
-                    let pageCount = self.pdf!.pageCount
-                    endPage = self.pdf!.page(at: pageCount-1)
-                } else {
-                    endPage = self.flatRootOutline[i+1].destination!.page!
-                }
-                let startIndex = self.pdf!.index(for: startPage)
-                let endIndex = self.pdf!.index(for: endPage!)
-                let newPDF = PDFDocument()
-                for i in startIndex...endIndex {
-                    let page = self.pdf!.page(at: i)
-                    newPDF.insert(page!, at: i-startIndex)
-                }
-                var fileName = outline.label!
-                fileName = fileName.replacingOccurrences(of: " ", with: "")
-                fileName = fileName.replacingOccurrences(of: ".", with: "-")
-                fileName = fileName.replacingOccurrences(of: "’", with: "")
-                fileName = fileName.replacingOccurrences(of: "'", with: "")
-                fileName = fileName+".pdf"
-                let path = self.tempDirURL!.absoluteString+fileName
-                newPDF.write(to: URL(string: path)!)
-                print("Wrote temp pdf to: "+URL(string: path)!.absoluteString)
-            }
+//            for i in 0..<self.flatRootOutline.count {
+//                let outline = self.flatRootOutline[i]
+//                let startPage = outline.destination!.page!
+//                var endPage: PDFPage?
+//                if (i+1 == self.flatRootOutline.count) {
+//                    let pageCount = self.pdf!.pageCount
+//                    endPage = self.pdf!.page(at: pageCount-1)
+//                } else {
+//                    endPage = self.flatRootOutline[i+1].destination!.page!
+//                }
+//                let startIndex = self.pdf!.index(for: startPage)
+//                let endIndex = self.pdf!.index(for: endPage!)
+//                let newPDF = PDFDocument()
+//                for i in startIndex...endIndex {
+//                    let page = self.pdf!.page(at: i)
+//                    newPDF.insert(page!, at: i-startIndex)
+//                }
+//                var fileName = outline.label!
+//                fileName = fileName.replacingOccurrences(of: ".", with: "-")
+//                fileName = fileName.forSorting
+//                fileName = fileName + ".pdf"
+//                let path = self.tempDirURL!.absoluteString+fileName
+//                newPDF.write(to: URL(string: path)!)
+//                print("Wrote temp pdf to: "+URL(string: path)!.absoluteString)
+//            }
         }
     }
     
