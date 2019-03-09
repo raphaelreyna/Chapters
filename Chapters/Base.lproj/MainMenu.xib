@@ -86,23 +86,23 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" texturedBackground="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenNone="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="496" y="156" width="827" height="491"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="800"/>
+            <rect key="contentRect" x="496" y="156" width="674" height="603"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1080"/>
             <value key="minSize" type="size" width="243" height="522"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
-                <rect key="frame" x="0.0" y="0.0" width="827" height="491"/>
+                <rect key="frame" x="0.0" y="0.0" width="674" height="603"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0Ja-ag-UhF">
-                        <rect key="frame" x="14" y="463" width="215" height="17"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" title="Your PDF has the following outline:" id="HVB-Xd-ztV">
+                        <rect key="frame" x="14" y="575" width="162" height="17"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" title="Your PDF will be split into:" id="HVB-Xd-ztV">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7QP-MH-C5K">
-                        <rect key="frame" x="685" y="4" width="132" height="32"/>
+                        <rect key="frame" x="532" y="4" width="132" height="32"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="120" id="qId-nK-ldn"/>
                         </constraints>
@@ -115,26 +115,26 @@
                         </connections>
                     </button>
                     <splitView arrangesAllSubviews="NO" dividerStyle="paneSplitter" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="F58-St-52s">
-                        <rect key="frame" x="16" y="43" width="795" height="409"/>
+                        <rect key="frame" x="16" y="43" width="642" height="521"/>
                         <subviews>
                             <customView id="Ajw-6o-OJa">
-                                <rect key="frame" x="0.0" y="0.0" width="278" height="409"/>
+                                <rect key="frame" x="0.0" y="0.0" width="224" height="521"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zQ5-RZ-Ahe">
-                                        <rect key="frame" x="1" y="1" width="276" height="407"/>
+                                        <rect key="frame" x="1" y="1" width="222" height="519"/>
                                         <clipView key="contentView" drawsBackground="NO" id="RyO-Lf-60F">
-                                            <rect key="frame" x="1" y="1" width="274" height="405"/>
+                                            <rect key="frame" x="1" y="1" width="220" height="517"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="sourceList" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" indentationPerLevel="16" outlineTableColumn="Mlk-f6-Tzt" id="TEO-IW-AKy">
-                                                    <rect key="frame" x="0.0" y="0.0" width="274" height="405"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="220" height="517"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                     <color key="backgroundColor" name="_sourceListBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                                     <tableColumns>
-                                                        <tableColumn width="271" minWidth="16" maxWidth="1000" id="Mlk-f6-Tzt">
+                                                        <tableColumn width="217" minWidth="16" maxWidth="1000" id="Mlk-f6-Tzt">
                                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                                 <font key="font" metaFont="smallSystem"/>
                                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -148,11 +148,11 @@
                                                             <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             <prototypeCellViews>
                                                                 <tableCellView identifier="HeaderCell" id="QgH-38-Lbd">
-                                                                    <rect key="frame" x="1" y="1" width="271" height="17"/>
+                                                                    <rect key="frame" x="1" y="1" width="217" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
                                                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bpt-3W-GWJ">
-                                                                            <rect key="frame" x="0.0" y="1" width="271" height="14"/>
+                                                                            <rect key="frame" x="0.0" y="1" width="217" height="14"/>
                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="HEADER CELL" id="wE8-qW-PBO">
                                                                                 <font key="font" metaFont="smallSystemBold"/>
@@ -166,11 +166,11 @@
                                                                     </connections>
                                                                 </tableCellView>
                                                                 <tableCellView identifier="SectionCell" id="Gtt-mz-OXI">
-                                                                    <rect key="frame" x="1" y="20" width="271" height="17"/>
+                                                                    <rect key="frame" x="1" y="20" width="217" height="17"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
                                                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jwq-nb-kVq">
-                                                                            <rect key="frame" x="1" y="0.0" width="270" height="17"/>
+                                                                            <rect key="frame" x="1" y="0.0" width="216" height="17"/>
                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                                                             <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="uvo-Ph-afh">
                                                                                 <font key="font" metaFont="system"/>
@@ -208,11 +208,11 @@
                                 </constraints>
                             </customView>
                             <customView id="u1J-be-E5q">
-                                <rect key="frame" x="288" y="0.0" width="507" height="409"/>
+                                <rect key="frame" x="234" y="0.0" width="408" height="521"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <pdfView autoresizesSubviews="NO" wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zgD-2C-Bsv">
-                                        <rect key="frame" x="0.0" y="0.0" width="507" height="409"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="408" height="521"/>
                                     </pdfView>
                                 </subviews>
                                 <constraints>
@@ -240,7 +240,7 @@
                     <constraint firstItem="0Ja-ag-UhF" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="16" id="wK2-zk-1ee"/>
                 </constraints>
             </view>
-            <point key="canvasLocation" x="390.5" y="170.5"/>
+            <point key="canvasLocation" x="314" y="226.5"/>
         </window>
     </objects>
 </document>
