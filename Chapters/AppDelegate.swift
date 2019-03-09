@@ -39,19 +39,71 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     var rootOutline: PDFOutline?
+    var flatRootOutline: [PDFOutline] = []
     var pdf: PDFDocument?
     var rootDirectoryURL: URL?
     var pdfName: String?
+    var tempDirURL: URL?
+    
+    func flatten(outline: PDFOutline) {
+        for index in 0..<outline.numberOfChildren{
+            let child = outline.child(at: index)!
+            flatRootOutline.append(child)
+            if (child.numberOfChildren != 0){
+                flatten(outline: child)
+            }
+        }
+    }
+    
+    func traverse(outline: PDFOutline) {
+        for index in 0..<outline.numberOfChildren{
+            let child = outline.child(at: index)
+            print("Label: "+child!.label!+", Dest.: "+String(self.pdf!.index(for: child!.destination!.page!)))
+            if (child!.numberOfChildren != 0){
+                print("The child above has the following children.")
+                traverse(outline: child!)
+            }
+        }
+    }
 
     func openFileCallBack(response: NSApplication.ModalResponse, openPanel: NSOpenPanel){
         if response == .OK {
             let selectedPath = openPanel.urls[0]
-            pdf = PDFDocument(url: selectedPath)!
-            pdfView.document = pdf!
-            rootOutline = pdf!.outlineRoot!
+            self.pdf = PDFDocument(url: selectedPath)!
+            self.pdfView.document = self.pdf!
+            self.rootOutline = pdf!.outlineRoot!
+            flatten(outline: self.rootOutline!)
             pdfName = selectedPath.deletingPathExtension().lastPathComponent
             self.window!.makeKeyAndOrderFront(nil)
             self.outlineView.reloadData()
+            
+            for i in 0..<self.flatRootOutline.count {
+                let outline = self.flatRootOutline[i]
+                let startPage = outline.destination!.page!
+                var endPage: PDFPage?
+                if (i+1 == self.flatRootOutline.count) {
+                    let pageCount = self.pdf!.pageCount
+                    endPage = self.pdf!.page(at: pageCount-1)
+                } else {
+                    endPage = self.flatRootOutline[i+1].destination!.page!
+                }
+                let startIndex = self.pdf!.index(for: startPage)
+                let endIndex = self.pdf!.index(for: endPage!)
+                let newPDF = PDFDocument()
+                for i in startIndex...endIndex {
+                    let page = self.pdf!.page(at: i)
+                    newPDF.insert(page!, at: i-startIndex)
+                }
+                var fileName = outline.label!
+                fileName = fileName.replacingOccurrences(of: " ", with: "")
+                fileName = fileName.replacingOccurrences(of: ".", with: "-")
+                fileName = fileName.replacingOccurrences(of: "’", with: "")
+                fileName = fileName.replacingOccurrences(of: "'", with: "")
+                fileName = fileName+".pdf"
+                let path = self.tempDirURL!.absoluteString+fileName
+                newPDF.write(to: URL(string: path)!)
+                print("Wrote temp pdf to: "+URL(string: path)!.absoluteString)
+            }
         }
     }
     
@@ -71,6 +123,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         self.outlineView.delegate = self
         self.outlineView.dataSource = self
+        self.tempDirURL = FileManager.default.temporaryDirectory
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -85,6 +138,14 @@ extension AppDelegate: NSOutlineViewDelegate {
     
     func outlineView(_: NSOutlineView, shouldCollapseItem: Any) -> Bool {
         return true
+    }
+    
+    func outlineView(_ outlineView: NSOutlineView, shouldSelectItem item: Any) -> Bool {
+        return true
+    }
+    
+    func outlineViewSelectionIsChanging(_ notification: Notification) {
+        print("Selected cell\n")
     }
     
     func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
@@ -147,4 +208,3 @@ extension AppDelegate: NSOutlineViewDataSource {
         return nil
     }
 }
-
