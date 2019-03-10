@@ -48,6 +48,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             
             self.pdf = PDFDocument(url: selectedPath)!
             self.pdfView.document = self.pdf!
+            self.pdfView.autoScales = true
             if self.pdf!.outlineRoot != nil {
                 self.rootOutline = self.pdf!.outlineRoot!
                 self.outlineViewDataSource = OutlineDataSource(for: self.pdf!)
