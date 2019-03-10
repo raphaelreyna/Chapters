@@ -22,7 +22,7 @@ func traverse(_ outline: PDFOutline, with method: (PDFOutline)->()) {
 }
 
 func flatten(outline: PDFOutline, into list: inout [PDFOutline]) {
-    traverse(outline) { child in list.append(child) }
+    traverse(outline) { child in if child.destination != nil { list.append(child) } }
 }
 
 func printLabels(outline: PDFOutline) {

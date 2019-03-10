@@ -26,12 +26,22 @@ extension AppDelegate: NSOutlineViewDelegate {
     func outlineViewSelectionIsChanging(_ notification: Notification) {
         let selectedRow = self.outlineView!.selectedRow
         let outline = self.outlineView!.item(atRow: selectedRow) as! PDFOutline
-        self.dirtyPDF = makePDF(from: outline, within: self.flatRootOutline, outOf: self.pdf!)
+        if outline.destination != nil {
+            self.dirtyPDF = makePDF(from: outline, within: self.flatRootOutline, outOf: self.pdf!)
+        }
+        else {
+            let alert = NSAlert()
+            alert.messageText = "The section you have selected does not point to a page."
+            alert.informativeText = "Please select another section, or edit the PDF and try again."
+            alert.alertStyle = .informational
+            alert.addButton(withTitle: "OK")
+            alert.runModal()
+            self.dirtyPDF = self.pdfView.document!
+        }
     }
     
     func outlineViewSelectionDidChange(_ notification: Notification) {
-        self.prevPDF = self.dirtyPDF
-        self.pdfView.document = self.prevPDF!
+        self.pdfView.document = self.dirtyPDF!
     }
     
     func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {

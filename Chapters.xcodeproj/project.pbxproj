@@ -59,11 +59,11 @@
 		11D042462231AF8E003DF8C0 /* Chapters */ = {
 			isa = PBXGroup;
 			children = (
-				110EA4622234863C00F46F16 /* OutlineViewDelegate.swift */,
-				110EA45E22346F1600F46F16 /* MiscExtensions.swift */,
-				110EA4602234716200F46F16 /* PDFFunctions.swift */,
 				11D042472231AF8E003DF8C0 /* AppDelegate.swift */,
+				110EA4622234863C00F46F16 /* OutlineViewDelegate.swift */,
 				110EA45C223468CB00F46F16 /* OutlineViewDataSource.swift */,
+				110EA4602234716200F46F16 /* PDFFunctions.swift */,
+				110EA45E22346F1600F46F16 /* MiscExtensions.swift */,
 				11D042492231AF8F003DF8C0 /* Assets.xcassets */,
 				11D0424B2231AF8F003DF8C0 /* MainMenu.xib */,
 				11D0424E2231AF8F003DF8C0 /* Info.plist */,
