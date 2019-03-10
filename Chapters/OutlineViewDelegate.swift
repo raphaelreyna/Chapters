@@ -7,6 +7,8 @@
 //
 
 import Foundation
+import Cocoa
+import Quartz
 
 extension AppDelegate: NSOutlineViewDelegate {
     func outlineView(_: NSOutlineView, shouldExpandItem: Any) -> Bool {

@@ -48,14 +48,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             
             self.pdf = PDFDocument(url: selectedPath)!
             self.pdfView.document = self.pdf!
-            self.rootOutline = pdf!.outlineRoot!
-            self.outlineViewDataSource = OutlineDataSource(for: self.pdf!)
-            self.pdfName = selectedPath.deletingPathExtension().lastPathComponent
-            
-            flatten(outline: self.rootOutline!, into: &(self.flatRootOutline))
-            
-            self.window!.makeKeyAndOrderFront(nil)
-            self.outlineView.reloadData()
+            if self.pdf!.outlineRoot != nil {
+                self.rootOutline = self.pdf!.outlineRoot!
+                self.outlineViewDataSource = OutlineDataSource(for: self.pdf!)
+                self.pdfName = selectedPath.deletingPathExtension().lastPathComponent
+                
+                flatten(outline: self.rootOutline!, into: &(self.flatRootOutline))
+                
+                self.window!.makeKeyAndOrderFront(nil)
+                self.outlineView.reloadData()
+            }
+            else {
+                let alert = NSAlert()
+                alert.informativeText = "Would you like to cancel or select another PDF?"
+                alert.messageText = "The PDF you have selected does not have an outline/table of contents."
+                alert.alertStyle = .informational
+                alert.addButton(withTitle: "Select another PDF")
+                alert.addButton(withTitle: "Cancel")
+                if alert.runModal() == .alertFirstButtonReturn {
+                    self.selectPDF(sender: self)
+                }
+                else {
+                    NSApplication.shared.terminate(self)
+                }
+            }
         }
     }
     
