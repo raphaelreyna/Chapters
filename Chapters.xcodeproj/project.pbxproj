@@ -21,6 +21,13 @@
 		110EA45E22346F1600F46F16 /* MiscExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiscExtensions.swift; sourceTree = "<group>"; };
 		110EA4602234716200F46F16 /* PDFFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFFunctions.swift; sourceTree = "<group>"; };
 		110EA4622234863C00F46F16 /* OutlineViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineViewDelegate.swift; sourceTree = "<group>"; };
+		110EA4732236109500F46F16 /* export64px.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = export64px.png; sourceTree = "<group>"; };
+		110EA4742236109500F46F16 /* export512px.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = export512px.png; sourceTree = "<group>"; };
+		110EA4752236109500F46F16 /* export128px.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = export128px.png; sourceTree = "<group>"; };
+		110EA4762236109500F46F16 /* export32px.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = export32px.png; sourceTree = "<group>"; };
+		110EA4772236109600F46F16 /* export16px.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = export16px.png; sourceTree = "<group>"; };
+		110EA4782236109600F46F16 /* export1024px.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = export1024px.png; sourceTree = "<group>"; };
+		110EA4792236109600F46F16 /* export256px.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = export256px.png; sourceTree = "<group>"; };
 		11D042442231AF8E003DF8C0 /* Chapters.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Chapters.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		11D042472231AF8E003DF8C0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		11D042492231AF8F003DF8C0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -40,6 +47,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		110EA4722236108400F46F16 /* Icons */ = {
+			isa = PBXGroup;
+			children = (
+				110EA4772236109600F46F16 /* export16px.png */,
+				110EA4762236109500F46F16 /* export32px.png */,
+				110EA4732236109500F46F16 /* export64px.png */,
+				110EA4752236109500F46F16 /* export128px.png */,
+				110EA4792236109600F46F16 /* export256px.png */,
+				110EA4742236109500F46F16 /* export512px.png */,
+				110EA4782236109600F46F16 /* export1024px.png */,
+			);
+			path = Icons;
+			sourceTree = "<group>";
+		};
 		11D0423B2231AF8E003DF8C0 = {
 			isa = PBXGroup;
 			children = (
@@ -68,6 +89,7 @@
 				11D0424B2231AF8F003DF8C0 /* MainMenu.xib */,
 				11D0424E2231AF8F003DF8C0 /* Info.plist */,
 				11D0424F2231AF8F003DF8C0 /* Chapters.entitlements */,
+				110EA4722236108400F46F16 /* Icons */,
 			);
 			path = Chapters;
 			sourceTree = "<group>";

@@ -24,7 +24,7 @@ func traverse(outline: PDFOutline,
             midFunc!(child)
         }
         if (child.numberOfChildren != 0){
-            traverse(outline: outline,
+            traverse(outline: child,
                      startFunc: startFunc,
                      midFunc: midFunc,
                      endFunc: endFunc)

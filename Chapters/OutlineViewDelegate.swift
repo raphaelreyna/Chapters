@@ -27,7 +27,7 @@ extension AppDelegate: NSOutlineViewDelegate {
         let selectedRow = self.outlineView!.selectedRow
         let outline = self.outlineView!.item(atRow: selectedRow) as! PDFOutline
         if outline.destination != nil {
-            self.dirtyPDF = makePDF(from: outline, within: self.flatRootOutline, outOf: self.pdf!)
+            self.dirtyPDF = makePDF(from: outline, within: self.flatRootOutline!, outOf: self.pdf!)
         }
         else {
             let alert = NSAlert()
