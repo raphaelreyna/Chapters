@@ -11,22 +11,43 @@
 import Foundation
 import Quartz
 
-func traverse(_ outline: PDFOutline, with method: (PDFOutline)->()) {
+func traverse(outline: PDFOutline,
+              startFunc: ((PDFOutline)->())?,
+              midFunc: ((PDFOutline)->())?,
+              endFunc: ((PDFOutline)->())?) {
     for index in 0..<outline.numberOfChildren{
         let child = outline.child(at: index)!
-        method(child)
+        if startFunc != nil && index == 0 {
+            startFunc!(child)
+        }
+        if midFunc != nil && index > 0 && index < outline.numberOfChildren-1 {
+            midFunc!(child)
+        }
         if (child.numberOfChildren != 0){
-            traverse(child, with: method)
+            traverse(outline: outline,
+                     startFunc: startFunc,
+                     midFunc: midFunc,
+                     endFunc: endFunc)
+        }
+        if midFunc != nil && index == outline.numberOfChildren-1 {
+            endFunc!(child)
         }
     }
 }
 
-func flatten(outline: PDFOutline, into list: inout [PDFOutline]) {
-    traverse(outline) { child in if child.destination != nil { list.append(child) } }
+func traverse(outline: PDFOutline, with function: @escaping (PDFOutline)->()) {
+    traverse(outline: outline, startFunc: function, midFunc: function, endFunc: function)
+}
+
+
+func flatten(outline: PDFOutline) -> [PDFOutline] {
+    var list: [PDFOutline] = []
+    traverse(outline: outline) { child in if child.destination != nil { list.append(child) } }
+    return list
 }
 
 func printLabels(outline: PDFOutline) {
-    traverse(outline) { child in print(child.label!) }
+    traverse(outline: outline) { child in print(child.label!) }
 }
 
 func makePDF(from startOutline: PDFOutline, within outlines: [PDFOutline], outOf pdf: PDFDocument) -> PDFDocument{

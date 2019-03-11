@@ -29,7 +29,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Properties
     
     var rootOutline: PDFOutline?
-    var flatRootOutline: [PDFOutline] = [] // A flat, sequential list of all of root outlines descendents.
+    var flatRootOutline: [PDFOutline]? // A flat, sequential list of all of root outlines descendents.
     var pdf: PDFDocument? // PDF that is to be split.
     var pdfName: String? // Name of PDF that is to be split.
     var dirtyPDF: PDFDocument? // Sub PDF waiting to be displayed.
@@ -54,7 +54,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self.outlineViewDataSource = OutlineDataSource(for: self.pdf!)
                 self.pdfName = selectedPath.deletingPathExtension().lastPathComponent
                 
-                flatten(outline: self.rootOutline!, into: &(self.flatRootOutline))
+                self.flatRootOutline = flatten(outline: self.rootOutline!)
                 
                 self.window!.makeKeyAndOrderFront(nil)
                 self.outlineView.reloadData()
@@ -86,9 +86,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             } catch let error as NSError {
                 print(error.localizedDescription)
             }
-            for i in 0..<self.flatRootOutline.count {
-                let outline = self.flatRootOutline[i]
-                let newPDF = makePDF(from: outline, within: self.flatRootOutline, outOf: self.pdf!)
+            for i in 0..<self.flatRootOutline!.count {
+                let outline = self.flatRootOutline![i]
+                let newPDF = makePDF(from: outline, within: self.flatRootOutline!, outOf: self.pdf!)
                 let path = makeURL(for: outline, relativeTo: rootDirectoryURL!)
                 newPDF.write(to: path)
                 #if DEBUG
