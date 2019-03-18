@@ -14,8 +14,9 @@ import Quartz
 func traverse(outline: PDFOutline,
               startFunc: ((PDFOutline)->())?,
               midFunc: ((PDFOutline)->())?,
-              endFunc: ((PDFOutline)->())?) {
-    for index in 0..<outline.numberOfChildren{
+              endFunc: ((PDFOutline)->())?,
+              postRecursionFunc: ((PDFOutline)->())?) {
+    for index in 0..<outline.numberOfChildren {
         let child = outline.child(at: index)!
         if startFunc != nil && index == 0 {
             startFunc!(child)
@@ -23,34 +24,38 @@ func traverse(outline: PDFOutline,
         if midFunc != nil && index > 0 && index < outline.numberOfChildren-1 {
             midFunc!(child)
         }
+        if endFunc != nil && index == outline.numberOfChildren-1 {
+            endFunc!(child)
+        }
         if (child.numberOfChildren != 0){
             traverse(outline: child,
                      startFunc: startFunc,
                      midFunc: midFunc,
-                     endFunc: endFunc)
-        }
-        if midFunc != nil && index == outline.numberOfChildren-1 {
-            endFunc!(child)
+                     endFunc: endFunc,
+                     postRecursionFunc: postRecursionFunc)
+            if postRecursionFunc != nil {
+                postRecursionFunc!(child)
+            }
+            
         }
     }
 }
 
-func traverse(outline: PDFOutline, with function: @escaping (PDFOutline)->()) {
-    traverse(outline: outline, startFunc: function, midFunc: function, endFunc: function)
-}
-
-
 func flatten(outline: PDFOutline) -> [PDFOutline] {
     var list: [PDFOutline] = []
-    traverse(outline: outline) { child in if child.destination != nil { list.append(child) } }
+    let closure: ((PDFOutline)->()) = { child in if child.destination != nil { list.append(child) }
+    }
+    traverse(outline: outline,
+             startFunc: closure,
+             midFunc: closure,
+             endFunc: closure,
+             postRecursionFunc: nil)
     return list
 }
 
-func printLabels(outline: PDFOutline) {
-    traverse(outline: outline) { child in print(child.label!) }
-}
-
-func makePDF(from startOutline: PDFOutline, within outlines: [PDFOutline], outOf pdf: PDFDocument) -> PDFDocument{
+func makePDF(from startOutline: PDFOutline,
+             within outlines: [PDFOutline],
+             outOf pdf: PDFDocument) -> PDFDocument {
     let startPage = startOutline.destination!.page!
     var endPage: PDFPage?
     let index = outlines.firstIndex(of: startOutline)!
@@ -63,23 +68,26 @@ func makePDF(from startOutline: PDFOutline, within outlines: [PDFOutline], outOf
     let startIndex = pdf.index(for: startPage)
     let endIndex = pdf.index(for: endPage!)
     let subPDF = PDFDocument()
-    for i in startIndex...endIndex {
-        let page = pdf.page(at: i)
-        subPDF.insert(page!, at: i-startIndex)
+    if endIndex > startIndex {
+        for i in startIndex...endIndex {
+            let page = pdf.page(at: i)
+            subPDF.insert(page!, at: i-startIndex)
+        }
+    } else {
+        let page = pdf.page(at: startIndex)
+        subPDF.insert(page!, at: 0)
     }
     return subPDF
 }
 
-func makeFileName(for outline: PDFOutline) -> String {
-    var fileName = outline.label!
-    fileName = fileName.replacingOccurrences(of: ".", with: "-")
-    fileName = fileName.forSorting
-    fileName = fileName + ".pdf"
-    return fileName
+func makeCleanLabel(for outline: PDFOutline) -> String {
+    var label = outline.label!
+    label = label.replacingOccurrences(of: ".", with: "-")
+    label = label.forSorting
+    return label
 }
 
 func makeURL(for outline: PDFOutline, relativeTo root: URL) -> URL {
-    let filename = makeFileName(for: outline)
-    let path = root.absoluteString+"/"+filename
-    return URL(string: path)!
+    let filename = makeCleanLabel(for: outline)+".pdf"
+    return root.appendingPathComponent(filename)
 }

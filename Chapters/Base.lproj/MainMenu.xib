@@ -17,6 +17,7 @@
             <connections>
                 <outlet property="outlineView" destination="TEO-IW-AKy" id="31b-M2-Yus"/>
                 <outlet property="pdfView" destination="zgD-2C-Bsv" id="VYU-QX-nFi"/>
+                <outlet property="structeredOutputButton" destination="6KB-X0-n8M" id="6Ig-Th-AWz"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -86,7 +87,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" texturedBackground="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenNone="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="496" y="156" width="674" height="603"/>
+            <rect key="contentRect" x="991" y="262" width="674" height="603"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1080"/>
             <value key="minSize" type="size" width="243" height="522"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
@@ -115,10 +116,10 @@
                         </connections>
                     </button>
                     <splitView arrangesAllSubviews="NO" dividerStyle="paneSplitter" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="F58-St-52s">
-                        <rect key="frame" x="16" y="43" width="642" height="521"/>
+                        <rect key="frame" x="16" y="43" width="652" height="521"/>
                         <subviews>
-                            <customView id="Ajw-6o-OJa">
-                                <rect key="frame" x="0.0" y="0.0" width="224" height="521"/>
+                            <customView misplaced="YES" id="Ajw-6o-OJa">
+                                <rect key="frame" x="0.0" y="0.0" width="228" height="521"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zQ5-RZ-Ahe">
@@ -190,6 +191,9 @@
                                             </subviews>
                                             <nil key="backgroundColor"/>
                                         </clipView>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="222" id="IZf-cF-RQR"/>
+                                        </constraints>
                                         <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="J3o-Jc-8Wh">
                                             <rect key="frame" x="1" y="384" width="253" height="16"/>
                                             <autoresizingMask key="autoresizingMask"/>
@@ -207,12 +211,12 @@
                                     <constraint firstAttribute="trailing" secondItem="zQ5-RZ-Ahe" secondAttribute="trailing" constant="1" id="xR4-Ca-FOq"/>
                                 </constraints>
                             </customView>
-                            <customView id="u1J-be-E5q">
-                                <rect key="frame" x="234" y="0.0" width="408" height="521"/>
+                            <customView misplaced="YES" id="u1J-be-E5q">
+                                <rect key="frame" x="238" y="0.0" width="414" height="521"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
                                     <pdfView autoresizesSubviews="NO" wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zgD-2C-Bsv">
-                                        <rect key="frame" x="0.0" y="0.0" width="408" height="521"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="418" height="521"/>
                                     </pdfView>
                                 </subviews>
                                 <constraints>
@@ -228,19 +232,34 @@
                             <real value="250"/>
                         </holdingPriorities>
                     </splitView>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="6KB-X0-n8M">
+                        <rect key="frame" x="14" y="16" width="123" height="18"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="119" id="hyK-ke-KqA"/>
+                            <constraint firstAttribute="height" constant="14" id="zrL-A6-LAV"/>
+                        </constraints>
+                        <buttonCell key="cell" type="check" title="Structure output" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="voG-kH-rt1">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                    </button>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="7QP-MH-C5K" secondAttribute="trailing" constant="16" id="9PR-0q-nJL"/>
                     <constraint firstAttribute="bottom" secondItem="7QP-MH-C5K" secondAttribute="bottom" constant="11" id="B5d-83-QLq"/>
                     <constraint firstItem="0Ja-ag-UhF" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="11" id="Ffi-7A-pos"/>
+                    <constraint firstAttribute="bottom" secondItem="6KB-X0-n8M" secondAttribute="bottom" constant="18" id="GIj-2R-mQZ"/>
+                    <constraint firstItem="6KB-X0-n8M" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="16" id="Ic8-Zd-e5t"/>
                     <constraint firstItem="F58-St-52s" firstAttribute="top" secondItem="0Ja-ag-UhF" secondAttribute="bottom" constant="11" id="PHc-ri-iwI"/>
-                    <constraint firstAttribute="trailing" secondItem="F58-St-52s" secondAttribute="trailing" constant="16" id="bIZ-U9-6Fj"/>
+                    <constraint firstAttribute="trailing" secondItem="F58-St-52s" secondAttribute="trailing" constant="6" id="bIZ-U9-6Fj"/>
+                    <constraint firstItem="6KB-X0-n8M" firstAttribute="top" secondItem="F58-St-52s" secondAttribute="bottom" constant="11" id="gET-Q0-Tir"/>
                     <constraint firstItem="F58-St-52s" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="16" id="isr-EW-OdR"/>
+                    <constraint firstItem="7QP-MH-C5K" firstAttribute="leading" secondItem="6KB-X0-n8M" secondAttribute="trailing" constant="403" id="rSs-aZ-D5m"/>
                     <constraint firstItem="7QP-MH-C5K" firstAttribute="top" secondItem="F58-St-52s" secondAttribute="bottom" constant="11" id="vnY-G6-aE7"/>
                     <constraint firstItem="0Ja-ag-UhF" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="16" id="wK2-zk-1ee"/>
                 </constraints>
             </view>
-            <point key="canvasLocation" x="314" y="226.5"/>
+            <point key="canvasLocation" x="-68" y="314"/>
         </window>
     </objects>
 </document>

@@ -16,6 +16,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var window: NSWindow!
     @IBOutlet weak var outlineView: NSOutlineView!
     @IBOutlet weak var pdfView: PDFView!
+    @IBOutlet weak var structeredOutputButton: NSButton!
     
     // MARK: - IBActions
     @IBAction func selectPDFAction(sender: AnyObject){
@@ -34,9 +35,34 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var pdfName: String? // Name of PDF that is to be split.
     var dirtyPDF: PDFDocument? // Sub PDF waiting to be displayed.
     var prevPDF: PDFDocument? // Sub PDF being displayed.
+    var currentWorkingDir: URL?
     var outlineViewDataSource: OutlineDataSource? {
         didSet {
             self.outlineView.dataSource = outlineViewDataSource!
+        }
+    }
+    
+    // MARK: - File System Methods
+    
+    func selectPDF(sender: AnyObject){
+        let openPanel = NSOpenPanel()
+        openPanel.allowsMultipleSelection = false
+        openPanel.canChooseDirectories = false
+        openPanel.canCreateDirectories = false
+        openPanel.canChooseFiles = true
+        openPanel.begin() { (response) in
+            self.openFileCallBack(response: response, openPanel: openPanel)
+        }
+    }
+    
+    func selectSaveFolder(sender: AnyObject){
+        let openPanel = NSOpenPanel()
+        openPanel.allowsMultipleSelection = false
+        openPanel.canChooseDirectories = true
+        openPanel.canCreateDirectories = true
+        openPanel.canChooseFiles = false
+        openPanel.begin() { (response) in
+            self.openDirectoryCallBack(response: response, openPanel: openPanel)
         }
     }
     
@@ -78,48 +104,73 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func openDirectoryCallBack(response: NSApplication.ModalResponse, openPanel: NSOpenPanel){
         if response == .OK {
-            let selectedURL = openPanel.urls[0].absoluteString
-            let rootDirectoryName = selectedURL+pdfName!
-            let rootDirectoryURL = URL(string: rootDirectoryName)
+            let selectedURL = openPanel.urls[0]
+            self.currentWorkingDir = selectedURL.appendingPathComponent(self.pdfName!, isDirectory: true)
             do {
-                try FileManager.default.createDirectory(at: rootDirectoryURL!, withIntermediateDirectories: true, attributes: nil)
+                try FileManager.default.createDirectory(at: self.currentWorkingDir!, withIntermediateDirectories: true, attributes: nil)
             } catch let error as NSError {
                 print(error.localizedDescription)
             }
-            for i in 0..<self.flatRootOutline!.count {
-                let outline = self.flatRootOutline![i]
-                let newPDF = makePDF(from: outline, within: self.flatRootOutline!, outOf: self.pdf!)
-                let path = makeURL(for: outline, relativeTo: rootDirectoryURL!)
-                newPDF.write(to: path)
-                #if DEBUG
-                print("Wrote temp pdf to: "+path.absoluteString)
-                #endif
+            if structeredOutputButton.state == .on {
+                self.saveWithStructure(to: self.currentWorkingDir!)
+            }
+            else {
+                self.saveWithoutStructure(to: self.currentWorkingDir!)
             }
         }
     }
     
-    // MARK: - File System Methods
+    // MARK: - Saving Methods
     
-    func selectPDF(sender: AnyObject){
-        let openPanel = NSOpenPanel()
-        openPanel.allowsMultipleSelection = false
-        openPanel.canChooseDirectories = false
-        openPanel.canCreateDirectories = false
-        openPanel.canChooseFiles = true
-        openPanel.begin() { (response) in
-            self.openFileCallBack(response: response, openPanel: openPanel)
+    func saveWithoutStructure(to rootDirectoryURL: URL) {
+        for i in 0..<self.flatRootOutline!.count {
+            let outline = self.flatRootOutline![i]
+            let newPDF = makePDF(from: outline, within: self.flatRootOutline!, outOf: self.pdf!)
+            let path = makeURL(for: outline, relativeTo: rootDirectoryURL)
+            newPDF.write(to: path)
+            #if DEBUG
+            print("Wrote pdf to: "+path.absoluteString)
+            #endif
         }
     }
     
-    func selectSaveFolder(sender: AnyObject){
-        let openPanel = NSOpenPanel()
-        openPanel.allowsMultipleSelection = false
-        openPanel.canChooseDirectories = true
-        openPanel.canCreateDirectories = true
-        openPanel.canChooseFiles = false
-        openPanel.begin() { (response) in
-            self.openDirectoryCallBack(response: response, openPanel: openPanel)
+    func moveIntoNewDir(for outline: PDFOutline) {
+        let newDirName = makeCleanLabel(for: outline)
+        let newWorkingPath = self.currentWorkingDir!.appendingPathComponent(newDirName, isDirectory: true)
+        do {
+            try FileManager.default.createDirectory(at: newWorkingPath,
+                                                    withIntermediateDirectories: true,
+                                                    attributes: nil)
+        } catch let error as NSError {
+            print(error.localizedDescription)
         }
+        self.currentWorkingDir = newWorkingPath
+    }
+    
+    func writeChildOutline(outline: PDFOutline) {
+        if outline.destination != nil {
+            let childPDF = makePDF(from: outline, within: self.flatRootOutline!, outOf: self.pdf!)
+            let path = makeURL(for: outline, relativeTo: self.currentWorkingDir!)
+            childPDF.write(to: path)
+            #if DEBUG
+            print("Wrote pdf to: "+path.absoluteString)
+            #endif
+        }
+    }
+    
+    func saveWithStructure(to rootDirectoryURL: URL) {
+        let write: ((PDFOutline)->()) = { childOutline in
+            if childOutline.numberOfChildren != 0 {
+                self.moveIntoNewDir(for: childOutline)
+            }
+            self.writeChildOutline(outline: childOutline)
+        }
+        
+        traverse(outline: self.rootOutline!,
+                startFunc: write,
+                midFunc: write,
+                endFunc: write,
+                postRecursionFunc: { _ in self.currentWorkingDir = self.currentWorkingDir!.deletingLastPathComponent() })
     }
     
     // MARK: - App Delegate Methods
